@@ -1,0 +1,275 @@
+= Funtionell programmering i javascript
+:imagesdir: images
+
+Magnus Härlin
+
+@MagnusHarlin
+
+https://github.com/mharlin/yrgo2020-functional-programming-in-js
+
+image::pagero_green.png[Pagero]
+
+== Why functional
+<span class="fragment">
+<img alt="Hipsters" src="./images/hipsters.jpg" style="border:0; height:500px" />
+</span>
+
+[.notes]
+Because all the hipsters do it</br>
+
+buzzwords like immutable data, first class functions, tail call optimization.
+They aid functional programming but you don't need to understand them to use it. </br>
+mapping, reducing, pipelining, recursing, currying and higher order functions. Constructs used
+to write functional code.</br>
+parallelization, lazy evaluation and determinism. Advantageous properties of functional programming
+
+
+=== Functional and OO
+
+<img alt="Michael Fethers" style="float: right" src="./images/michaelfeathers.jpg" />
+
+<div style="display: block">
+OO makes code understandable by ***encapsulating*** moving parts.
+<br/><br/>
+
+FP makes code understandable by ***minimizing*** moving parts.
+<br/><br/>
+<small>Micheal Feathers, author of "Working effectively with Legacy Code"</small>
+</div>
+
+
+=== Imperative
+* State
+* Concurrency even harder
+
+
+=== Functional code is characterised by absense of side effects
+<b>Data flow and transformation</b>
+<span class="fragment"><i>instead of how objects interact</i></span>
+
+
+=== Pure functions
+<klipse-snippet data-language="javascript">
+var name = "Magnus"
+
+function greet() {
+  console.log("Hi, I am " + name)
+}
+
+greet()
+  </klipse-snippet>
+
+  <span class="fragment">
+  <klipse-snippet data-language="javascript">
+  function greet(name) {
+    return "Hi " + name
+  }
+
+greet("Codenight")
+</klipse-snippet>
+</span>
+
+[.notes]
+Impure first part: global state and side effect in function
+
+
+== Don't iterate with mutable state... <span class="fragment"><i>Transform</i></span>
+<img src="./images/transformation.jpg" />
+<div>
+<small>
+<a href="https://commons.wikimedia.org/wiki/File:Transformation.JPG">
+Didacool @ wikimedia</a>
+</small>
+</div>
+
+
+<klipse-snippet data-language="javascript">
+function greet(name) { 
+  return "Hi " + name 
+}
+
+function addExclamation (str, exclamation) {
+  return str.trimRight() + exclamation
+}
+
+const names = ["magnus", "codenight"]
+var greetings = []
+
+for(var i = 0; i < names.length; i++) {
+  greetings[i] =  addExclamation(greet(names[i]), "!")
+}
+
+greetings
+</klipse-snippet>
+
+
+=== Higher order functions
+<img src="./images/higherorder.jpg" />
+<div>
+<a href="https://www.flickr.com/photos/jamesjordan/2226419650"><small>jamesjordan @ flickr</small></a>
+</div>
+[.notes]
+Function that takes function as arguments or function that returns a function
+
+
+=== !
+<pre>
+<code class="javascript" data-trim data-noescape>
+const greet = name => "Hi " + name
+
+<span class="fragment">const greetAndAddExclamation = (greetfn, name) => 
+exclamation => greetfn(name).trimRight() + exclamation</span>
+
+<span class="fragment">function greetAndAddExclamation (greetfn, name) {
+  return function (exclamation) { 
+    greetfn(name).trimRight() + exclamation 
+  }
+}</span>
+
+<span class="fragment">greetAndAddExclamation(greet, "magnus ")("!")</span>
+</code>
+</pre>
+
+[.notes]
+Arrow notation, common in functional languages
+
+
+=== !
+<klipse-snippet data-language="javascript">
+const greet = name => "Hi " + name
+
+const greetAndAddExclamation = (greetfn, name) => 
+exclamation => greetfn(name).trimRight() + exclamation
+
+function greetAndAddExclamation2 (greetfn, name) {
+  return function (exclamation) { 
+    greetfn(name).trimRight() + exclamation 
+  }
+}
+
+greetAndAddExclamation(greet, "magnus ")("!")
+</klipse-snippet>
+
+
+=== transform with map, reduce, filter
+<img src="./images/mapreduce.png" />
+[.notes]
+Map - Slice - function applied to each ingredient
+Reduced - Combine - Adds the chopped ingredients together
+Filter - if we don't want all ingredients
+
+
+=== !
+<pre>
+<code class="javascript" data-trim data-noescape>
+const greet = name => "Hi " + name
+const names = ["magnus", "codenight"]
+
+const addExclamation = 
+(str, exclamation) => str.trimRight() + exclamation
+
+<span class="fragment">names.map</span><span class="fragment">(greet)</span>
+<span class="fragment">     .map(x => addExclamation(x, "!"))</span>
+</code>
+</pre>
+
+[.notes]
+Two different ways of passing a function
+
+
+=== !
+<klipse-snippet data-language="javascript">
+const greet = name => "Hi " + name
+const names = ["magnus", "codenight"]
+const addExclamation = (str, exclamation) => str.trimRight() + exclamation
+
+names.map(greet).map(x => addExclamation(x, "!"))
+</klipse-snippet>
+
+
+== Function composition
+<pre>
+<code class="javascript" data-trim data-noescape>
+const greet = name => "Hi " + name
+
+const addExclamation = exclamation => 
+str => str.trimRight() + exclamation
+
+<span class="fragment" data-fragment-index=1>const capitalize = name => 
+name[0].toUpperCase() + name.substr(1)</span>
+
+<span class="fragment" data-fragment-index=2>addExclamation("!")(greet(capitalize("magnus")))</span>
+</code>
+</pre>
+
+
+=== !
+<klipse-snippet data-language="javascript">
+//const compose = (...fns) => fns.reduceRight((f, g) => (...args) => f(g(...args)))
+
+const capitalize = name => name[0].toUpperCase() + name.substr(1)
+
+const greet = name => "Hi " + name
+const addExclamation = exclamation => str => str.trimRight() + exclamation
+
+//const addGreetingAndExclamation = compose(greet, addExclamation("!"))
+
+addExclamation("!")(greet(capitalize("magnus")))
+</klipse-snippet>
+
+[.notes]
+... = spread operator, deconstracts array into multiple arguments
+add capitalize as the first parameter in the compose function
+
+
+== Mutable state is the new spaghetti code
+<img alt="Spaghetti code" src="./images/spaghetti.jpg" height="500px" />
+</br>
+<small>
+<a href="https://www.flickr.com/photos/oskay/2177296503">oskay @ flickr</a>
+</small>
+[.notes]
+Easier to compare objects
+Copied objects can point to the same memory
+Goes well with the React / Redux architecture
+
+
+== Concurrency
+<pre>
+<code class="javascript" data-trim data-noescape>
+const validLength = name => name.length <= 6
+
+const onlyValidChars = 
+name => ['!', '?'].every(c => !name.includes(c))
+
+<span class="fragment">const applyAllPar = ( ... fns ) => 
+arg => fns.par.map(f => f(arg))</span>
+
+<span class="fragment">const validations = applyAllPar(validateLength, validateChars)</span>
+
+<span class="fragment">const names = new Parallel(["codenight", "magnus"])</span>
+
+<span class="fragment">names.filter(validations.every(Boolean))
+.map(addGreetingAndExclamation)</span>
+</code>
+</pre>
+
+
+=== Efficient immutability
+* <a href="http://swannodette.github.io/mori/">Mori</a>
+* <a href="http://facebook.github.io/immutable-js/">Immutable.js</a>
+
+
+=== FP libraries for JS
+* <a href="http://underscorejs.org">Underscore</a>
+* <a href="https://lodash.com">Lodash</a>
+* <a href="http://ramdajs.com">Ramda</a>
+
+
+== Thank you!
+<img alt="Tama66 / pixabay" src="./images/hope.jpg" style="border:0; width:450px" />
+
+Please let me know what you thought about the session @MagnusHarlin
+
+The slides are available at https://mharlin.github.io/yrgo2020-functional-programming-in-js/
+
