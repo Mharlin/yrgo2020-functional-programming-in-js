@@ -1,0 +1,12 @@
+{
+  "name": "yrgo2020-functional-programming-in-js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Mharlin/yrgo2020-functional-programming-in-js.git",
+  "author": "Magnus Härlin <magnus.harlin@pagero.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@asciidoctor/reveal.js": "^4.0.1",
+    "asciidoctor": "^2.0"
+  }
+}
