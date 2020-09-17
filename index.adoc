@@ -105,12 +105,12 @@ link:https://commons.wikimedia.org/wiki/File:Transformation.JPG[Didacool @ wikim
 === !
 [source.eval-javascript]
 ----
-function greet(name) { 
-  return "Hi " + name 
+function greet(name) {
+  return "Hi " + name
 }
 
 function addExclamation (str, exclamation) {
-  return str.trimRight() + exclamation
+  return str + exclamation
 }
 
 const names = ["magnus", "yrgo"]
@@ -120,7 +120,7 @@ for(var i = 0; i < names.length; i++) {
   greetings[i] =  addExclamation(greet(names[i]), "!")
 }
 
-greetings
+""
 ----
 
 
@@ -145,16 +145,16 @@ const greet = name => "Hi " + name
 [.fragment]
 ----
 const greetAndAddExclamation = (greetfn, name) =>
-    exclamation => 
-      greetfn(name).trimRight() + exclamation
+    exclamation =>
+      greetfn(name) + exclamation
 ----
 [source]
 [.fragment]
 ----
 
 function greetAndAddExclamation (greetfn, name) {
-  return function (exclamation) { 
-    return greetfn(name).trimRight() + exclamation 
+  return function (exclamation) {
+    return greetfn(name) + exclamation 
   }
 }
 ----
@@ -176,11 +176,11 @@ Arrow notation, common in functional languages
 const greet = name => "Hi " + name
 
 const greetAndAddExclamation = (greetfn, name) =>
-  exclamation => greetfn(name).trimRight() + exclamation
+  exclamation => greetfn(name) + exclamation
 
 function greetAndAddExclamation2 (greetfn, name) {
   return function (exclamation) {
-    return greetfn(name).trimRight() + exclamation
+    return greetfn(name) + exclamation
   }
 }
 
@@ -205,10 +205,14 @@ Filter - if we don't want all ingredients
 const greet = name => "Hi " + name
 const names = ["magnus", "yrgo"]
 
-const addExclamation = 
-  (str, exclamation) => str.trimRight() + exclamation
-
-names.map(name => greet(name))
+const addExclamation =
+  (str, exclamation) => str + exclamation
+----
+[source]
+[.fragment]
+----
+names
+  .map(name => greet(name))
   .map(x => addExclamation(x, "!"))
 ----
 
@@ -222,11 +226,13 @@ Two different ways of passing a function
 [source.eval-javascript]
 ----
 const greet = name => "Hi " + name
-const names = ["magnus", "codenight"]
+const names = ["magnus", "yrgo"]
 const addExclamation = (str, exclamation) =>
-  str.trimRight() + exclamation
+  str + exclamation
 
-names.map(name => greet(name)).map(x => addExclamation(x, "!"))
+names
+  .map(name => greet(name))
+  .map(x => addExclamation(x, "!"))
 ----
 
 
@@ -237,7 +243,8 @@ const capitalize =
   name => name[0].toUpperCase() + name.substr(1)
 
 const greet = name => "Hi " + name
-const addExclamation = exclamation => str => str.trimRight() + exclamation
+const addExclamation = exclamation => 
+  str => str + exclamation
 
 addExclamation("!")(greet(capitalize("magnus")))
 ----
@@ -247,7 +254,7 @@ addExclamation("!")(greet(capitalize("magnus")))
 const compose = (...fns) => 
   fns.reduceRight((f, g) => (...args) => f(g(...args)))
 
-const addGreetingAndExclamation = 
+const addGreetingAndExclamation =
   compose(greet, addExclamation("!"))
 ----
 
